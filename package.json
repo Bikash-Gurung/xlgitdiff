@@ -1,0 +1,39 @@
+{
+  "name": "xldiff",
+  "displayName": "xldiff",
+  "description": "Git diff for excel file",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.95.3"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "xldiff.diffxl",
+        "title": "diffxl"
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.100.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1"
+  },
+  "dependencies": {
+    "simple-git": "^3.27.0",
+    "xlsx": "^0.18.5"
+  }
+}
