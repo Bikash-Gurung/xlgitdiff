@@ -9,15 +9,6 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
     ]),
   ];
 
-  const removedSheets = [];
-  Object.keys(differences).forEach((key) => {
-    differences[key].forEach((diff) => {
-      if (diff.type === "SHEET_REMOVED") {
-        removedSheets.push(key);
-      }
-    });
-  });
-
   return `<!DOCTYPE html>
   <html lang="en">
   <head>
@@ -268,12 +259,7 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
       <div class="tabs">
           ${allSheets
             .map((sheet, index) => {
-              // if (!removedSheets.includes(sheet)) {
-              //   `<button class="tab ${
-              //     index === 0 ? "active" : ""
-              //   }" onclick="switchTab('${sheet}')">${sheet}</button>`;
-              // }
-              `<button class="tab ${
+              return `<button class="tab ${
                 index === 0 ? "active" : ""
               }" onclick="switchTab('${sheet}')">${sheet}</button>`;
             })
