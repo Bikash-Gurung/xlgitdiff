@@ -1,37 +1,34 @@
-function compareExcelJson(currentData, committedData) {
+function compareExcelJson(currentJson, committedJson) {
   const differences = {};
 
-  // Get all sheet names from both datasets
-  const currentSheets = Object.keys(currentData || {});
-  const committedSheets = Object.keys(committedData || {});
+  const currentSheets = Object.keys(currentJson || {});
+  const committedSheets = Object.keys(committedJson || {});
   const allSheets = [...new Set([...currentSheets, ...committedSheets])];
 
   allSheets.forEach((sheetName) => {
-    const currentSheet = currentData?.[sheetName] || [];
-    const committedSheet = committedData?.[sheetName] || [];
+    const currentSheet = currentJson?.[sheetName] || [];
+    const committedSheet = committedJson?.[sheetName] || [];
     const sheetDifferences = [];
 
-    // Check if sheet exists in both
-    if (!currentData?.[sheetName]) {
+    if (!currentJson?.[sheetName]) {
       sheetDifferences.push({
         type: "SHEET_REMOVED",
         name: sheetName,
-        message: `Sheet '${sheetName}' was removed from current file`,
+        message: `Sheet '${sheetName}' is removed from current file`,
       });
       differences[sheetName] = sheetDifferences;
       return;
     }
 
-    if (!committedData?.[sheetName]) {
+    if (!committedJson?.[sheetName]) {
       sheetDifferences.push({
         type: "SHEET_ADDED",
-        message: `Sheet '${sheetName}' was added to current file`,
+        message: `Sheet '${sheetName}' is added to current file`,
       });
       differences[sheetName] = sheetDifferences;
       return;
     }
 
-    // Create maps for easier lookup by row number
     const currentRowMap = new Map();
     const committedRowMap = new Map();
 
@@ -52,12 +49,11 @@ function compareExcelJson(currentData, committedData) {
       const currentRow = currentRowMap.get(rowNum);
       const committedRow = committedRowMap.get(rowNum);
 
-      // Check if row was added or removed
       if (!currentRow) {
         sheetDifferences.push({
           type: "ROW_REMOVED",
           row: rowNum,
-          message: `Row ${rowNum} was removed`,
+          message: `Row ${rowNum} is removed`,
         });
         return;
       }
@@ -66,7 +62,7 @@ function compareExcelJson(currentData, committedData) {
         sheetDifferences.push({
           type: "ROW_ADDED",
           row: rowNum,
-          message: `Row ${rowNum} was added`,
+          message: `Row ${rowNum} is added`,
           currentData: currentRow,
         });
         return;
@@ -106,7 +102,7 @@ function compareExcelJson(currentData, committedData) {
             type: "COLUMN_REMOVED",
             row: rowNum,
             col: colNum,
-            message: `Column ${colNum} in row ${rowNum} was removed`,
+            message: `Column ${colNum} in row ${rowNum} is removed`,
             committedData: committedCol,
           });
           return;
@@ -117,7 +113,7 @@ function compareExcelJson(currentData, committedData) {
             type: "COLUMN_ADDED",
             row: rowNum,
             col: colNum,
-            message: `Column ${colNum} in row ${rowNum} was added`,
+            message: `Column ${colNum} in row ${rowNum} is added`,
             currentData: currentCol,
           });
           return;
@@ -155,7 +151,6 @@ function compareExcelJson(currentData, committedData) {
   return differences;
 }
 
-// Helper function to get a summary of differences
 function getDifferencesSummary(differences) {
   const summary = {
     totalSheets: Object.keys(differences).length,
@@ -173,78 +168,7 @@ function getDifferencesSummary(differences) {
   return summary;
 }
 
-// Helper function to format differences for readable output
-function formatDifferences(differences) {
-  let output = "";
-
-  Object.entries(differences).forEach(([sheetName, sheetDiffs]) => {
-    output += `\n=== Sheet: ${sheetName} ===\n`;
-
-    sheetDiffs.forEach((diff) => {
-      switch (diff.type) {
-        case "SHEET_ADDED":
-        case "SHEET_REMOVED":
-          output += `${diff.message}\n`;
-          break;
-        case "ROW_ADDED":
-        case "ROW_REMOVED":
-          output += `${diff.message}\n`;
-          break;
-        case "COLUMN_ADDED":
-        case "COLUMN_REMOVED":
-          output += `${diff.message}\n`;
-          break;
-        case "VALUE_CHANGED":
-          output += `${diff.message}\n`;
-          output += `  Current: ${diff.currentValue}\n`;
-          output += `  Committed: ${diff.committedValue}\n`;
-          break;
-      }
-    });
-  });
-
-  return output;
-}
-
-// Main comparison function that uses your Excel reading functions
-async function compareExcelFiles(
-  filePath,
-  readCurrentExcelData,
-  readCommittedExcelData
-) {
-  try {
-    const currentData = await readCurrentExcelData(filePath);
-    const committedData = await readCommittedExcelData(filePath);
-
-    if (!currentData || !committedData) {
-      console.error("Failed to read one or both Excel files");
-      return null;
-    }
-
-    const differences = compareExcelJson(currentData, committedData);
-    const summary = getDifferencesSummary(differences);
-
-    console.log("Comparison Summary:", summary);
-
-    if (summary.totalDifferences > 0) {
-      console.log("\nDetailed Differences:");
-      console.log(formatDifferences(differences));
-    } else {
-      console.log(
-        "No differences found between current and committed versions."
-      );
-    }
-
-    return { differences, summary };
-  } catch (error) {
-    console.error("Error comparing Excel files:", error);
-    return null;
-  }
-}
-
 module.exports = {
   compareExcelJson,
   getDifferencesSummary,
-  formatDifferences,
-  compareExcelFiles,
 };

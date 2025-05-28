@@ -1,8 +1,25 @@
-const fs = require("fs");
-const os = require("os");
+const vscode = require("vscode");
 const xlsx = require("xlsx");
 const path = require("path");
 const simpleGit = require("simple-git");
+
+function getCurrentExcelFilePath() {
+  const editor = vscode.window.activeTextEditor;
+
+  if (!editor) {
+    vscode.window.showErrorMessage("No active editor found.");
+    return null;
+  }
+
+  const filePath = editor.document.uri.fsPath;
+
+  if (!filePath.endsWith(".xlsx")) {
+    vscode.window.showErrorMessage("The active file is not an .xlsx file.");
+    return null;
+  }
+
+  return filePath;
+}
 
 async function readCurrentExcelData(filePath) {
   try {
@@ -29,7 +46,7 @@ async function readCurrentExcelData(filePath) {
         });
 
         return {
-          row: rowIndex + 2, // +2 because we skip header row and want 1-based indexing
+          row: rowIndex + 2,
           data: data,
         };
       });
@@ -87,7 +104,7 @@ async function readCommittedExcelData(filePath) {
         });
 
         return {
-          row: rowIndex + 2, // +2 because we skip header row and want 1-based indexing
+          row: rowIndex + 2,
           data: data,
         };
       });
@@ -102,4 +119,8 @@ async function readCommittedExcelData(filePath) {
   }
 }
 
-module.exports = { readCurrentExcelData, readCommittedExcelData };
+module.exports = {
+  getCurrentExcelFilePath,
+  readCurrentExcelData,
+  readCommittedExcelData,
+};
