@@ -69,15 +69,20 @@ async function readCommittedExcelData(filePath) {
     const repoRoot = await tempGit.revparse(["--show-toplevel"]);
     const git = simpleGit(repoRoot);
 
-    let relativePath = path.relative(repoRoot, filePath);
+    const relativePath = path.relative(repoRoot, filePath);
 
     const tracked = await git
       .raw(["ls-files", "--error-unmatch", relativePath])
       .catch(() => null);
     if (!tracked) throw new Error("File is not committed in Git");
 
-    relativePath = relativePath.replace(/\//g, "\\");
-    const buffer = await git.binaryCatFile(["blob", `HEAD:${relativePath}`]);
+    const lsTree = await git.raw(["ls-tree", "HEAD", "--", relativePath]);
+    let gitPath;
+    if (lsTree.trim()) {
+      const parts = lsTree.trim().split(/\s+/);
+      gitPath = parts[3];
+    }
+    const buffer = await git.binaryCatFile(["blob", `HEAD:${gitPath}`]);
 
     if (!Buffer.isBuffer(buffer))
       throw new Error("Failed to get binary content");
