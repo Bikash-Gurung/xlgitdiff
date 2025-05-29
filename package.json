@@ -4,7 +4,7 @@
   "description": "Git diff for excel file",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.95.3"
+    "vscode": "^1.100.0"
   },
   "categories": [
     "Other"
