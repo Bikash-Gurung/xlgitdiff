@@ -12,8 +12,8 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
   return `<!DOCTYPE html>
   <html lang="en">
   <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Excel Diff Viewer</title>
       <style>
           * {
@@ -21,32 +21,32 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
               padding: 0;
               box-sizing: border-box;
           }
-  
+
           body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               background-color: var(--vscode-editor-background);
               color: var(--vscode-editor-foreground);
               padding: 20px;
           }
-  
+
           .header {
               margin-bottom: 20px;
               padding-bottom: 15px;
               border-bottom: 1px solid var(--vscode-panel-border);
           }
-  
+
           .file-path {
               font-size: 14px;
               color: var(--vscode-descriptionForeground);
               margin-bottom: 10px;
           }
-  
+
           .summary {
               display: flex;
               gap: 20px;
               flex-wrap: wrap;
           }
-  
+
           .summary-item {
               background: var(--vscode-badge-background);
               color: var(--vscode-badge-foreground);
@@ -54,14 +54,14 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
               border-radius: 4px;
               font-size: 12px;
           }
-  
+
           .tabs {
               display: flex;
               border-bottom: 1px solid var(--vscode-panel-border);
               margin-bottom: 20px;
               overflow-x: auto;
           }
-  
+
           .tab {
               padding: 10px 20px;
               cursor: pointer;
@@ -72,46 +72,47 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
               white-space: nowrap;
               font-size: 14px;
           }
-  
+
           .tab:hover {
               background: var(--vscode-tab-hoverBackground);
           }
-  
+
           .tab.active {
               color: var(--vscode-tab-activeForeground);
               border-bottom-color: var(--vscode-tab-activeBorder);
               background: var(--vscode-tab-activeBackground);
           }
-  
+
           .sheet-content {
               display: none;
           }
-  
+
           .sheet-content.active {
               display: block;
           }
-  
+
           .table-container {
               overflow: auto;
               max-height: 70vh;
               border: 1px solid var(--vscode-panel-border);
               border-radius: 4px;
           }
-  
+
           table {
               width: 100%;
               border-collapse: collapse;
               background: var(--vscode-editor-background);
           }
-  
-          th, td {
+
+          th,
+          td {
               border: 1px solid var(--vscode-panel-border);
               padding: 8px 12px;
               text-align: left;
               white-space: nowrap;
               min-width: 100px;
           }
-  
+
           th {
               background: var(--vscode-list-hoverBackground);
               font-weight: 600;
@@ -119,7 +120,7 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
               top: 0;
               z-index: 10;
           }
-  
+
           .row-header {
               background: var(--vscode-list-hoverBackground);
               font-weight: 600;
@@ -129,29 +130,30 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
               left: 0;
               z-index: 5;
           }
-  
+
           /* Difference highlighting */
           .added {
               background-color: rgba(46, 160, 67, 0.2) !important;
               border-left: 3px solid #2ea043;
           }
-  
+
           .removed {
               background-color: rgba(248, 81, 73, 0.2) !important;
               border-left: 3px solid #f85149;
           }
-  
+
           .modified {
               background-color: rgba(251, 188, 5, 0.2) !important;
               border-left: 3px solid #fbbc05;
           }
-  
+
           .cell-tooltip {
               position: relative;
               cursor: help;
           }
-  
-          .cell-tooltip:hover::after {
+
+          /* Tooltip only on modified cells */
+          .cell-tooltip.modified:hover::after {
               content: attr(data-tooltip);
               position: absolute;
               bottom: 100%;
@@ -167,42 +169,51 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
               font-size: 12px;
               max-width: 200px;
           }
-  
+
           .legend {
               display: flex;
               gap: 15px;
               margin-bottom: 15px;
               flex-wrap: wrap;
           }
-  
+
           .legend-item {
               display: flex;
               align-items: center;
               gap: 5px;
               font-size: 12px;
           }
-  
+
           .legend-color {
               width: 16px;
               height: 16px;
               border-radius: 2px;
               border-left: 3px solid;
           }
-  
-          .legend-added { background-color: rgba(46, 160, 67, 0.2); border-left-color: #2ea043; }
-          .legend-removed { background-color: rgba(248, 81, 73, 0.2); border-left-color: #f85149; }
-          .legend-modified { background-color: rgba(251, 188, 5, 0.2); border-left-color: #fbbc05; }
-  
+
+          .legend-added {
+              background-color: rgba(46, 160, 67, 0.2);
+              border-left-color: #2ea043;
+          }
+          .legend-removed {
+              background-color: rgba(248, 81, 73, 0.2);
+              border-left-color: #f85149;
+          }
+          .legend-modified {
+              background-color: rgba(251, 188, 5, 0.2);
+              border-left-color: #fbbc05;
+          }
+
           .no-data {
               text-align: center;
               padding: 40px;
               color: var(--vscode-descriptionForeground);
           }
-  
+
           .version-toggle {
               margin-bottom: 15px;
           }
-  
+
           .version-btn {
               background: var(--vscode-button-secondaryBackground);
               color: var(--vscode-button-secondaryForeground);
@@ -213,12 +224,12 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
               border-radius: 4px;
               font-size: 12px;
           }
-  
+
           .version-btn.active {
               background: var(--vscode-button-background);
               color: var(--vscode-button-foreground);
           }
-  
+
           .version-btn:hover {
               background: var(--vscode-button-hoverBackground);
           }
@@ -234,7 +245,7 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
               }</div>
           </div>
       </div>
-  
+
       <div class="legend">
           <div class="legend-item">
               <div class="legend-color legend-added"></div>
@@ -249,23 +260,24 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
               <span>Removed</span>
           </div>
       </div>
-  
+
       <div class="version-toggle">
+          <button class="version-btn" onclick="toggleVersion('committed')">Previous Version</button>
           <button class="version-btn active" onclick="toggleVersion('current')">Current Version</button>
-          <button class="version-btn" onclick="toggleVersion('committed')">Committed Version</button>
           <button class="version-btn" onclick="toggleVersion('diff')">Diff View</button>
       </div>
-  
+
       <div class="tabs">
           ${allSheets
-            .map((sheet, index) => {
-              return `<button class="tab ${
-                index === 0 ? "active" : ""
-              }" onclick="switchTab('${sheet}')">${sheet}</button>`;
-            })
+            .map(
+              (sheet, index) =>
+                `<button class="tab ${
+                  index === 0 ? "active" : ""
+                }" onclick="switchTab('${sheet}')">${sheet}</button>`
+            )
             .join("")}
       </div>
-  
+
       ${allSheets
         .map((sheetName, index) => {
           const currentSheet = currentData?.[sheetName] || [];
@@ -286,41 +298,41 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
           `;
         })
         .join("")}
-  
+
       <script>
           let currentView = 'current';
-          
+
           function switchTab(sheetName) {
               // Hide all sheets
               document.querySelectorAll('.sheet-content').forEach(sheet => {
                   sheet.classList.remove('active');
               });
-              
+
               // Remove active from all tabs
               document.querySelectorAll('.tab').forEach(tab => {
                   tab.classList.remove('active');
               });
-              
+
               // Show selected sheet
               document.getElementById(sheetName).classList.add('active');
-              
+
               // Mark tab as active
               event.target.classList.add('active');
           }
-          
+
           function toggleVersion(version) {
               currentView = version;
-              
+
               // Update button states
               document.querySelectorAll('.version-btn').forEach(btn => {
                   btn.classList.remove('active');
               });
               event.target.classList.add('active');
-              
+
               // Update table display
               updateTableDisplay();
           }
-          
+
           function updateTableDisplay() {
               const tables = document.querySelectorAll('table');
               tables.forEach(table => {
@@ -328,25 +340,40 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
                   rows.forEach(row => {
                       const cells = row.querySelectorAll('td:not(.row-header)');
                       cells.forEach(cell => {
-                          const currentValue = cell.getAttribute('data-current');
-                          const committedValue = cell.getAttribute('data-committed');
-                          const changeType = cell.getAttribute('data-change');
-                          
+                          const currentValue = cell.getAttribute('data-current') || '';
+                          const committedValue = cell.getAttribute('data-committed') || '';
+                          const changeType = cell.getAttribute('data-change') || '';
+
                           if (currentView === 'current') {
-                              cell.textContent = currentValue || '';
-                              cell.className = '';
+                              cell.textContent = currentValue;
+                              cell.className = 'cell-tooltip';
+                              cell.removeAttribute('data-tooltip');
                           } else if (currentView === 'committed') {
-                              cell.textContent = committedValue || '';
-                              cell.className = '';
+                              cell.textContent = committedValue;
+                              cell.className = 'cell-tooltip';
+                              cell.removeAttribute('data-tooltip');
                           } else { // diff view
-                              cell.textContent = currentValue || '';
-                              cell.className = changeType || '';
+                              if (changeType === 'removed') {
+                                  cell.textContent = committedValue;
+                              } else {
+                                  cell.textContent = currentValue;
+                              }
+                              cell.className = 'cell-tooltip ' + changeType;
+
+                              if (changeType === 'modified') {
+                                  cell.setAttribute(
+                                    'data-tooltip',
+                                    'Previous: ' + committedValue + '\\nCurrent: ' + currentValue
+                                  );
+                              } else {
+                                  cell.removeAttribute('data-tooltip');
+                              }
                           }
                       });
                   });
               });
           }
-          
+
           // Initialize with current view
           updateTableDisplay();
       </script>
@@ -383,95 +410,95 @@ function generateSheetTable(
   const rows = Array.from(allRows).sort((a, b) => a - b);
 
   // Create difference lookup
-  const diffLookup = new Map();
+  const diffLookup = new Map(); // key: row_col_key, value: type
   sheetDiffs.forEach((diff) => {
-    const key = `${diff.row}-${diff.col}-${diff.column}`;
-    diffLookup.set(key, diff);
+    const key = `${diff.row}_${diff.col}_${diff.key}`;
+    diffLookup.set(key, diff.type);
   });
 
-  // Generate table
-  let tableHTML = `
-          <div class="table-container">
-              <table>
-                  <thead>
-                      <tr>
-                          <th class="row-header">Row</th>
-                          ${columns
-                            .map(
-                              (col, index) =>
-                                `<th>Col ${index + 1}<br/>${col}</th>`
-                            )
-                            .join("")}
-                      </tr>
-                  </thead>
-                  <tbody>
-      `;
+  // Build table header with columns
+  const headerCols = columns.map((col) => `<th>${col}</th>`).join("");
+  // Row header + columns
+  let html = `<div class="table-container"><table><thead><tr><th class="row-header">Row</th>${headerCols}</tr></thead><tbody>`;
 
-  rows.forEach((rowNum) => {
-    const currentRow = currentSheet.find((r) => r.row === rowNum);
-    const committedRow = committedSheet.find((r) => r.row === rowNum);
+  for (const rowNum of rows) {
+    html += `<tr><td class="row-header">${rowNum}</td>`;
 
-    tableHTML += `<tr>
-              <td class="row-header">${rowNum}</td>
-          `;
+    for (const colName of columns) {
+      // Find current value and committed value for this cell & column key
+      const currentRow = currentSheet.find((r) => r.row === rowNum);
+      const committedRow = committedSheet.find((r) => r.row === rowNum);
 
-    columns.forEach((colName, colIndex) => {
-      const colNum = colIndex + 1;
+      let currentCellObj = null;
+      let committedCellObj = null;
 
-      const currentCell = currentRow?.data.find(
-        (c) => c[colName] !== undefined
-      );
-      const committedCell = committedRow?.data.find(
-        (c) => c[colName] !== undefined
-      );
-
-      const currentValue = currentCell?.[colName] || "";
-      const committedValue = committedCell?.[colName] || "";
-
-      const diffKey = `${rowNum}-${colNum}-${colName}`;
-      const diff = diffLookup.get(diffKey);
-
-      let changeType = "";
-      let tooltip = "";
-
-      if (diff) {
-        switch (diff.type) {
-          case "VALUE_CHANGED":
-            changeType = "modified";
-            tooltip = `Changed:\\nCurrent: ${currentValue}\\nCommitted: ${committedValue}`;
-            break;
-          case "COLUMN_ADDED":
-            changeType = "added";
-            tooltip = `Added: ${currentValue}`;
-            break;
-          case "COLUMN_REMOVED":
-            changeType = "removed";
-            tooltip = `Removed: ${committedValue}`;
-            break;
-        }
+      if (currentRow) {
+        currentCellObj = currentRow.data.find((c) =>
+          Object.keys(c).some((k) => k !== "col" && k === colName)
+        );
+      }
+      if (committedRow) {
+        committedCellObj = committedRow.data.find((c) =>
+          Object.keys(c).some((k) => k !== "col" && k === colName)
+        );
       }
 
-      tableHTML += `
-                  <td class="cell-tooltip" 
-                      data-current="${currentValue}" 
-                      data-committed="${committedValue}"
-                      data-change="${changeType}"
-                      ${tooltip ? `data-tooltip="${tooltip}"` : ""}>
-                      ${currentValue}
-                  </td>
-              `;
-    });
+      const currentValue = currentCellObj ? currentCellObj[colName] ?? "" : "";
+      const committedValue = committedCellObj
+        ? committedCellObj[colName] ?? ""
+        : "";
 
-    tableHTML += "</tr>";
-  });
+      // Find change type for this cell/key
+      const key = `${rowNum}_${
+        currentCellObj ? currentCellObj.col : ""
+      }_${colName}`;
+      let changeType = diffLookup.get(key) || "";
 
-  tableHTML += `
-                  </tbody>
-              </table>
-          </div>
-      `;
+      // Special handling for deleted rows or columns (show committed value as removed)
+      if (changeType === "" && committedValue !== "" && currentValue === "") {
+        changeType = "removed";
+      }
 
-  return tableHTML;
+      // For added cells
+      if (changeType === "" && currentValue !== "" && committedValue === "") {
+        changeType = "added";
+      }
+
+      // For modified cells
+      if (
+        changeType === "" &&
+        currentValue !== committedValue &&
+        currentValue !== "" &&
+        committedValue !== ""
+      ) {
+        changeType = "modified";
+      }
+
+      html += `<td 
+                  class="cell-tooltip ${changeType}" 
+                  data-current="${escapeHtml(currentValue)}" 
+                  data-committed="${escapeHtml(committedValue)}" 
+                  data-change="${changeType}"
+                ></td>`;
+    }
+
+    html += "</tr>";
+  }
+
+  html += "</tbody></table></div>";
+  return html;
 }
 
-module.exports = { getWebviewContent };
+function escapeHtml(text) {
+  return text
+    .toString()
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+module.exports = {
+  getWebviewContent,
+};
