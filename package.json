@@ -12,10 +12,19 @@
   "activationEvents": [],
   "main": "./extension.js",
   "contributes": {
+    "menus": {
+      "editor/title": [
+        {
+          "command": "xldiff.diffxl",
+          "when": "resourceExtname == .xls || resourceExtname == .xlsx",
+          "group": "navigation"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "xldiff.diffxl",
-        "title": "diffxl"
+        "title": "Show Excel Diff"
       }
     ]
   },
