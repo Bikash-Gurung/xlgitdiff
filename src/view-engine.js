@@ -1,6 +1,7 @@
 const { getDifferencesSummary } = require("./diff-engine");
+const vscode = require('vscode')
 
-function getWebviewContent(currentData, committedData, differences, filePath) {
+function getWebviewContent(currentData, committedData, differences, filePath, webview, extensionUri) {
   // Get all sheet names
   const allSheets = [
     ...new Set([
@@ -8,232 +9,16 @@ function getWebviewContent(currentData, committedData, differences, filePath) {
       ...Object.keys(committedData || {}),
     ]),
   ];
-
+  const styleUrl = webview.asWebviewUri(
+     vscode.Uri.joinPath(extensionUri, 'media', 'view.css')
+  )
   return `<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Excel Diff Viewer</title>
-      <style>
-          * {
-              margin: 0;
-              padding: 0;
-              box-sizing: border-box;
-          }
-
-          body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              background-color: var(--vscode-editor-background);
-              color: var(--vscode-editor-foreground);
-              padding: 20px;
-          }
-
-          .header {
-              margin-bottom: 20px;
-              padding-bottom: 15px;
-              border-bottom: 1px solid var(--vscode-panel-border);
-          }
-
-          .file-path {
-              font-size: 14px;
-              color: var(--vscode-descriptionForeground);
-              margin-bottom: 10px;
-          }
-
-          .summary {
-              display: flex;
-              gap: 20px;
-              flex-wrap: wrap;
-          }
-
-          .summary-item {
-              background: var(--vscode-badge-background);
-              color: var(--vscode-badge-foreground);
-              padding: 5px 10px;
-              border-radius: 4px;
-              font-size: 12px;
-          }
-
-          .tabs {
-              display: flex;
-              border-bottom: 1px solid var(--vscode-panel-border);
-              margin-bottom: 20px;
-              overflow-x: auto;
-          }
-
-          .tab {
-              padding: 10px 20px;
-              cursor: pointer;
-              border: none;
-              background: transparent;
-              color: var(--vscode-tab-inactiveForeground);
-              border-bottom: 2px solid transparent;
-              white-space: nowrap;
-              font-size: 14px;
-          }
-
-          .tab:hover {
-              background: var(--vscode-tab-hoverBackground);
-          }
-
-          .tab.active {
-              color: var(--vscode-tab-activeForeground);
-              border-bottom-color: var(--vscode-tab-activeBorder);
-              background: var(--vscode-tab-activeBackground);
-          }
-
-          .sheet-content {
-              display: none;
-          }
-
-          .sheet-content.active {
-              display: block;
-          }
-
-          .table-container {
-              overflow: auto;
-              max-height: 70vh;
-              border: 1px solid var(--vscode-panel-border);
-              border-radius: 4px;
-          }
-
-          table {
-              width: 100%;
-              border-collapse: collapse;
-              background: var(--vscode-editor-background);
-          }
-
-          th,
-          td {
-              border: 1px solid var(--vscode-panel-border);
-              padding: 8px 12px;
-              text-align: left;
-              white-space: nowrap;
-              min-width: 100px;
-          }
-
-          th {
-              background: var(--vscode-list-hoverBackground);
-              font-weight: 600;
-              position: sticky;
-              top: 0;
-              z-index: 10;
-          }
-
-          .row-header {
-              background: var(--vscode-list-hoverBackground);
-              font-weight: 600;
-              text-align: center;
-              min-width: 60px;
-              position: sticky;
-              left: 0;
-              z-index: 5;
-          }
-
-          /* Difference highlighting */
-          .added {
-              background-color: rgba(46, 160, 67, 0.2) !important;
-              border-left: 3px solid #2ea043;
-          }
-
-          .removed {
-              background-color: rgba(248, 81, 73, 0.2) !important;
-              border-left: 3px solid #f85149;
-          }
-
-          .modified {
-              background-color: rgba(251, 188, 5, 0.2) !important;
-              border-left: 3px solid #fbbc05;
-          }
-
-          .cell-tooltip {
-              position: relative;
-              cursor: help;
-          }
-
-          /* Tooltip only on modified cells */
-          .cell-tooltip.modified:hover::after {
-              content: attr(data-tooltip);
-              position: absolute;
-              bottom: 100%;
-              left: 50%;
-              transform: translateX(-50%);
-              background: var(--vscode-editorHoverWidget-background);
-              color: var(--vscode-editorHoverWidget-foreground);
-              padding: 8px;
-              border-radius: 4px;
-              white-space: pre-line;
-              z-index: 1000;
-              border: 1px solid var(--vscode-editorHoverWidget-border);
-              font-size: 12px;
-              max-width: 200px;
-          }
-
-          .legend {
-              display: flex;
-              gap: 15px;
-              margin-bottom: 15px;
-              flex-wrap: wrap;
-          }
-
-          .legend-item {
-              display: flex;
-              align-items: center;
-              gap: 5px;
-              font-size: 12px;
-          }
-
-          .legend-color {
-              width: 16px;
-              height: 16px;
-              border-radius: 2px;
-              border-left: 3px solid;
-          }
-
-          .legend-added {
-              background-color: rgba(46, 160, 67, 0.2);
-              border-left-color: #2ea043;
-          }
-          .legend-removed {
-              background-color: rgba(248, 81, 73, 0.2);
-              border-left-color: #f85149;
-          }
-          .legend-modified {
-              background-color: rgba(251, 188, 5, 0.2);
-              border-left-color: #fbbc05;
-          }
-
-          .no-data {
-              text-align: center;
-              padding: 40px;
-              color: var(--vscode-descriptionForeground);
-          }
-
-          .version-toggle {
-              margin-bottom: 15px;
-          }
-
-          .version-btn {
-              background: var(--vscode-button-secondaryBackground);
-              color: var(--vscode-button-secondaryForeground);
-              border: none;
-              padding: 6px 12px;
-              margin-right: 10px;
-              cursor: pointer;
-              border-radius: 4px;
-              font-size: 12px;
-          }
-
-          .version-btn.active {
-              background: var(--vscode-button-background);
-              color: var(--vscode-button-foreground);
-          }
-
-          .version-btn:hover {
-              background: var(--vscode-button-hoverBackground);
-          }
-      </style>
+      <link rel="stylesheet" href="${styleUrl}">
   </head>
   <body>
       <div class="header">

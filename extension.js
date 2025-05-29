@@ -49,7 +49,9 @@ function activate(context) {
           currentJson,
           committedJson,
           differences,
-          excelFilePath
+          excelFilePath,
+          panel.webview,
+          context.extensionUri
         );
       }
     }
