@@ -217,3 +217,15 @@ th {
 .version-btn:hover {
     background: var(--vscode-button-hoverBackground);
 }
+
+.info-alert {
+    background-color: #d9edf7;
+    color: #31708f;
+    padding: 10px 15px;
+    border: 1px #bce8f1 black;
+    border-radius: 5px;
+    font-family: sans-serif;
+    font-size: 14px;
+    margin: 10px 0px;
+    max-width: 32%;
+}

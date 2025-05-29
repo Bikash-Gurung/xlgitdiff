@@ -12,6 +12,8 @@ function getWebviewContent(currentData, committedData, differences, filePath, we
   const styleUrl = webview.asWebviewUri(
      vscode.Uri.joinPath(extensionUri, 'media', 'view.css')
   )
+  const noChangesSection = '<div class="info-alert">No changes since last commit.</div><br />';
+
   return `<!DOCTYPE html>
   <html lang="en">
   <head>
@@ -46,6 +48,9 @@ function getWebviewContent(currentData, committedData, differences, filePath, we
           </div>
       </div>
 
+      <!-- When no changes are there, show the message -->
+      ${getDifferencesSummary(differences).totalDifferences <= 0 ? noChangesSection: ''}
+      
       <div class="version-toggle">
           <button class="version-btn" onclick="toggleVersion('committed')">Previous Version</button>
           <button class="version-btn active" onclick="toggleVersion('current')">Current Version</button>
