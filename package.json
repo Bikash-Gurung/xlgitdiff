@@ -26,6 +26,18 @@
         "command": "xldiff.diffxl",
         "title": "Show Excel Diff"
       }
+    ],
+    "customEditors": [
+      {
+        "viewType": "xldiff.viewfile",
+        "displayName": "Excel Diff Viewer",
+        "selector": [
+          {
+            "filenamePattern": "*.xls*"
+          }
+        ],
+        "priority": "option"
+      }
     ]
   },
   "scripts": {
