@@ -17,11 +17,13 @@ function activate(context) {
           excelFilePath
         );
 
-        if (!currentJson || !committedJson) {
-          vscode.window.showErrorMessage(
-            "Failed to read the current or committed Excel data."
-          );
-          return;
+        if (!currentJson) {
+            vscode.window.showErrorMessage("Failed to read the current Excel data.");
+            return;
+        }
+        if (!committedJson) {
+            vscode.window.showErrorMessage("Failed to read the committed Excel data.");
+            return;
         }
 
         const differences = diffEngine.compareExcelJson(
