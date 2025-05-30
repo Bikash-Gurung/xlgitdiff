@@ -12,10 +12,10 @@ function getCurrentExcelFilePath() {
   }
 
   const filePath = editor.document.uri.fsPath;
-
-  if (!filePath.endsWith(".xlsx")) {
-    vscode.window.showErrorMessage("The active file is not an .xlsx file.");
-    return null;
+  debugger;
+  if (!filePath.endsWith(".xlsx") && !filePath.endsWith(".xls")) {
+      vscode.window.showErrorMessage("The active file is not an .xlsx or .xls file.");
+      return null;
   }
 
   return filePath;
