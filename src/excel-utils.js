@@ -12,7 +12,6 @@ function getCurrentExcelFilePath() {
   }
 
   const filePath = editor.document.uri.fsPath;
-  debugger;
   if (!filePath.endsWith(".xlsx") && !filePath.endsWith(".xls")) {
       vscode.window.showErrorMessage("The active file is not an .xlsx or .xls file.");
       return null;
@@ -62,6 +61,8 @@ async function readCurrentExcelData(filePath) {
 }
 
 async function readCommittedExcelData(filePath) {
+  let relativePath;
+
   try {
     const fileDir = path.dirname(filePath);
     const tempGit = simpleGit(fileDir);
@@ -69,7 +70,7 @@ async function readCommittedExcelData(filePath) {
     const repoRoot = await tempGit.revparse(["--show-toplevel"]);
     const git = simpleGit(repoRoot);
 
-    const relativePath = path.relative(repoRoot, filePath);
+    relativePath = path.relative(repoRoot, filePath);
 
     const tracked = await git
       .raw(["ls-files", "--error-unmatch", relativePath])
@@ -120,7 +121,7 @@ async function readCommittedExcelData(filePath) {
 
     return result;
   } catch (err) {
-    console.error("Error reading committed Excel:", err.message);
+    vscode.window.showErrorMessage(`No commits found for ${relativePath} to compare`);
     return null;
   }
 }

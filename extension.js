@@ -22,7 +22,7 @@ function activate(context) {
             return;
         }
         if (!committedJson) {
-            vscode.window.showErrorMessage("Failed to read the committed Excel data.");
+            // vscode.window.showErrorMessage("Failed to read the committed Excel data.");
             return;
         }
 
