@@ -91,8 +91,8 @@ td {
     border: 1px solid var(--vscode-panel-border);
     padding: 8px 12px;
     text-align: left;
-    white-space: nowrap;
-    min-width: 100px;
+    max-width: 100px;
+    overflow-x: hidden;
 }
 
 th {
@@ -131,7 +131,7 @@ th {
 
 .cell-tooltip {
     position: relative;
-    cursor: help;
+    cursor: pointer;
 }
 
 /* Tooltip only on modified cells */
