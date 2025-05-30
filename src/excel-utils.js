@@ -5,18 +5,15 @@ const simpleGit = require("simple-git");
 
 function getCurrentExcelFilePath() {
   const editor = vscode.window.activeTextEditor;
-
   if (!editor) {
-    vscode.window.showErrorMessage("No active editor found.");
-    return null;
+      vscode.window.showErrorMessage("No active editor found.");
+      return null;
   }
-
   const filePath = editor.document.uri.fsPath;
   if (!filePath.endsWith(".xlsx") && !filePath.endsWith(".xls")) {
       vscode.window.showErrorMessage("The active file is not an .xlsx or .xls file.");
       return null;
   }
-
   return filePath;
 }
 
@@ -43,19 +40,17 @@ async function readCurrentExcelData(filePath) {
           });
           colIndex++;
         });
-
         return {
           row: rowIndex + 2,
           data: data,
         };
       });
-
       result[sheetName] = transformedJson;
     });
-
     return result;
-  } catch (err) {
-    console.error("Error reading current Excel as JSON:", err);
+  }
+  catch (err) {
+    vscode.window.showErrorMessage("Error reading current Excel file.");
     return null;
   }
 }
@@ -75,8 +70,10 @@ async function readCommittedExcelData(filePath) {
     const tracked = await git
       .raw(["ls-files", "--error-unmatch", relativePath])
       .catch(() => null);
-    if (!tracked) throw new Error("File is not committed in Git");
 
+    if (!tracked) {
+        throw new Error("File is not committed in Git");
+    }
     const lsTree = await git.raw(["ls-tree", "HEAD", "--", relativePath]);
     let gitPath;
     if (lsTree.trim()) {
@@ -84,9 +81,9 @@ async function readCommittedExcelData(filePath) {
       gitPath = parts[3];
     }
     const buffer = await git.binaryCatFile(["blob", `HEAD:${gitPath}`]);
-
-    if (!Buffer.isBuffer(buffer))
-      throw new Error("Failed to get binary content");
+    if (!Buffer.isBuffer(buffer)) {
+        throw new Error("Failed to get binary content");
+    }
 
     const workbook = xlsx.read(buffer, { type: "buffer" });
     const result = {};
@@ -118,10 +115,10 @@ async function readCommittedExcelData(filePath) {
 
       result[sheetName] = transformedJson;
     }
-
     return result;
-  } catch (err) {
-    vscode.window.showErrorMessage(`No commits found for ${relativePath} to compare`);
+  } 
+  catch (err) {
+    vscode.window.showInformationMessage(`No commits found for ${relativePath} to compare`);
     return null;
   }
 }

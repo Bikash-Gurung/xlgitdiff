@@ -41,9 +41,7 @@ function compareExcelJson(currentJson, committedJson) {
     });
 
     // Get all row numbers from both datasets
-    const allRows = [
-      ...new Set([...currentRowMap.keys(), ...committedRowMap.keys()]),
-    ];
+    const allRows = [...new Set([...currentRowMap.keys(), ...committedRowMap.keys()])];
 
     allRows.forEach((rowNum) => {
       const currentRow = currentRowMap.get(rowNum);
@@ -88,9 +86,7 @@ function compareExcelJson(currentJson, committedJson) {
       });
 
       // Get all column numbers from both rows
-      const allCols = [
-        ...new Set([...currentColMap.keys(), ...committedColMap.keys()]),
-      ];
+      const allCols = [...new Set([...currentColMap.keys(), ...committedColMap.keys()])];
 
       allCols.forEach((colNum) => {
         const currentCol = currentColMap.get(colNum);
@@ -103,7 +99,7 @@ function compareExcelJson(currentJson, committedJson) {
             row: rowNum,
             col: colNum,
             message: `Column ${colNum} in row ${rowNum} is removed`,
-            committedData: committedCol,
+            committedData: committedCol
           });
           return;
         }
@@ -114,7 +110,7 @@ function compareExcelJson(currentJson, committedJson) {
             row: rowNum,
             col: colNum,
             message: `Column ${colNum} in row ${rowNum} is added`,
-            currentData: currentCol,
+            currentData: currentCol
           });
           return;
         }
@@ -136,7 +132,7 @@ function compareExcelJson(currentJson, committedJson) {
               column: key,
               message: `Value changed in row ${rowNum}, column ${colNum} (${key})`,
               currentValue: currentValue,
-              committedValue: committedValue,
+              committedValue: committedValue
             });
           }
         });
@@ -164,7 +160,6 @@ function getDifferencesSummary(differences) {
       summary.byType[diff.type] = (summary.byType[diff.type] || 0) + 1;
     });
   });
-
   return summary;
 }
 
