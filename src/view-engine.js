@@ -54,7 +54,7 @@ function getWebviewContent(currentData, committedData, differences, filePath, we
       <div class="version-toggle">
           <button class="version-btn" onclick="toggleVersion('committed')">Previous Version</button>
           <button class="version-btn active" onclick="toggleVersion('current')">Current Version</button>
-          <button class="version-btn" onclick="toggleVersion('diff')">Differences</button>
+          <button class="version-btn" onclick="toggleVersion('diff')">View Changes</button>
       </div>
 
       <div class="tabs">

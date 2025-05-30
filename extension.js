@@ -83,7 +83,6 @@ function getProvider(context) {
           async openCustomDocument(uri, openContext, token) {
             return { uri, dispose: () => {} }; // No editing support, just view
           },
-  
           async resolveCustomEditor(document, webviewPanel, token) {
               webviewPanel.webview.options = {
               enableScripts: true,
