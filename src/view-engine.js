@@ -13,7 +13,7 @@ function getWebviewContent(currentData, committedData, differences, filePath, we
      vscode.Uri.joinPath(extensionUri, 'media', 'view.css')
   )
   const totalDifferences = getDifferencesSummary(differences).totalDifferences
-  const noChangesSection = '<div class="info-alert">No changes since last commit.</div><br />';
+  const noChangesSection = '<div class="info-alert">No changes are detected.</div><br />';
 
   return `<!DOCTYPE html>
       <html lang="en">
@@ -25,7 +25,7 @@ function getWebviewContent(currentData, committedData, differences, filePath, we
       </head>
       <body>
           <div class="header">
-              <div class="file-path">File: ${filePath}</div>
+              <div class="file-path">${filePath}</div>
               <div class="summary">
                   <div class="summary-item">Sheets: ${allSheets.length}</div>
                   <div class="summary-item">Total Changes: ${totalDifferences}</div>

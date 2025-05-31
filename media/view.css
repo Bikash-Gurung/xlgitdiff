@@ -228,5 +228,5 @@ th {
     font-family: sans-serif;
     font-size: 14px;
     margin: 10px 0px;
-    max-width: 32%;
+    width: fit-content;
 }
