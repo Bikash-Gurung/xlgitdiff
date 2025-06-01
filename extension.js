@@ -3,6 +3,8 @@ const excelUtils = require("./src/excel-utils");
 const diffEngine = require("./src/diff-engine");
 const { getWebviewContent } = require("./src/view-engine");
 
+const path = require("node:path");
+
 const { RUNNING_COMMAND, VIEW_OPTION_COMMAND, VIEW_OPTION_DISPLAY_NAME, 
         UPLOAD_AND_COMPARE_EXCEL_FILES, UPLOAD_AND_COMPARE_EXCEL_FILES_DISPLAY_NAME,
         SELECT_TWO_EXCEL_FILES_BUTTON_LABEL } = require('./src/constants');
@@ -58,7 +60,7 @@ function getProvider(context) {
   return provider;
 }
 
-async function renderExcelViews(firstJson, secondJson, actionCommand, displayCommand, excelFilePath, context) {
+async function renderExcelViews(firstJson, secondJson, actionCommand, displayCommand, excelFilePath, context, fileNames = {}) {
     if (!firstJson || !secondJson) {
         vscode.window.showWarningMessage("Read failed, Make sure Excel file is selected or it has commit.");
         return;
@@ -79,13 +81,24 @@ async function renderExcelViews(firstJson, secondJson, actionCommand, displayCom
       }
     );
     
+    // Listen for the event sent from the webview.
+    panel.webview.onDidReceiveMessage(
+      async (message) => {
+        if (message?.command?.eventType === UPLOAD_AND_COMPARE_EXCEL_FILES) {
+            vscode.commands.executeCommand(UPLOAD_AND_COMPARE_EXCEL_FILES);
+        }
+      },
+      undefined,
+      context.subscriptions
+    );
     panel.webview.html = getWebviewContent(
       firstJson,
       secondJson,
       differences,
       excelFilePath,
       panel.webview,
-      context.extensionUri
+      context.extensionUri,
+      fileNames
     );
 }
 
@@ -115,15 +128,29 @@ async function uploadAndCompareExcelFiles(context) {
     // Store the file paths of the selected Excel files. This will always be of two files.
     const filePaths = [];
     try {
-        const fileData = fileUris.forEach(filePath => filePaths.push(filePath.fsPath));
+        fileUris.forEach(uri => {
+              fileDetails = {}
+              fileDetails.filePath = uri.fsPath;
+              fileDetails.fileName = path.basename(uri.fsPath);
+              filePaths.push(fileDetails);
+        });
         // Use readCurrentExcelData method for both as it is manual comparision and there might be no git commit.
-        const jsonForFirstFile = await excelUtils.readCurrentExcelData(filePaths[0]);
-        const jsonForSecondFile = await excelUtils.readCurrentExcelData(filePaths[1]);
+        const jsonForFirstFile = await excelUtils.readCurrentExcelData(filePaths[0].filePath);
+        const jsonForSecondFile = await excelUtils.readCurrentExcelData(filePaths[1].filePath);
+    
+        const fileNames = {
+            // Indices are reversed to match the order of filePaths
+            firstFileName: `File: ${filePaths[1].fileName}`,
+            secondFileName: `File: ${filePaths[0].fileName}`
+        }
         
-        await renderExcelViews(jsonForFirstFile, jsonForSecondFile, UPLOAD_AND_COMPARE_EXCEL_FILES, UPLOAD_AND_COMPARE_EXCEL_FILES_DISPLAY_NAME, `Comparing uploaded excel files:' ${filePaths[0]} and ${filePaths[1]}`, context);
+        await renderExcelViews(jsonForFirstFile, jsonForSecondFile, UPLOAD_AND_COMPARE_EXCEL_FILES, 
+          UPLOAD_AND_COMPARE_EXCEL_FILES_DISPLAY_NAME, 
+          `Comparing uploaded excel files: ${filePaths[0].filePath} and ${filePaths[1].filePath}`,
+           context, fileNames);
     } 
     catch (err) {
-        vscode.window.showErrorMessage('Error comparing Excel files: ' + err.message);
+        vscode.window.showErrorMessage('Error comparing Excel files '+ err.message);
     }
 }
 
