@@ -1,7 +1,9 @@
 const { getDifferencesSummary } = require("./diff-engine");
 const vscode = require('vscode');
 
-function getWebviewContent(currentData, committedData, differences, filePath, webview, extensionUri) {
+const { UPLOAD_AND_COMPARE_EXCEL_FILES } = require('./constants');
+
+function getWebviewContent(currentData, committedData, differences, filePath, webview, extensionUri, fileNames = {}) {
   // Get all sheet names
   const allSheets = [
     ...new Set([
@@ -13,7 +15,11 @@ function getWebviewContent(currentData, committedData, differences, filePath, we
      vscode.Uri.joinPath(extensionUri, 'media', 'view.css')
   )
   const totalDifferences = getDifferencesSummary(differences).totalDifferences
-  const noChangesSection = '<div class="info-alert">No changes since last commit.</div><br />';
+  const noChangesSection = '<div class="info-alert">No changes are detected.</div><br />';
+
+  // Use file name if they have been compared using the manual upload and compare button
+  const previousVersionButton = fileNames?.firstFileName ?? 'Previous Version';
+  const currentVersionButton = fileNames?.secondFileName ?? 'Current Version';
 
   return `<!DOCTYPE html>
       <html lang="en">
@@ -25,10 +31,16 @@ function getWebviewContent(currentData, committedData, differences, filePath, we
       </head>
       <body>
           <div class="header">
-              <div class="file-path">File: ${filePath}</div>
+              <div class="file-path">${filePath}</div>
               <div class="summary">
-                  <div class="summary-item">Sheets: ${allSheets.length}</div>
-                  <div class="summary-item">Total Changes: ${totalDifferences}</div>
+                  <div class="summary-left">
+                      <div class="summary-item">Sheets: ${allSheets.length}</div>
+                      <div class="summary-item">Total Changes: ${totalDifferences}</div>
+                  </div>
+                  <div class="summary-right">
+                      <div class="summary-item manual-upload-btn" id="manual-upload" onclick="manuallySelectAndCompareFiles();" 
+                        data-title="You can select and compare two excel files. For exmaple, files from two different commits or similar uncommitted files.">Upload and Compare</div>
+                  </div>
               </div>
           </div>
 
@@ -50,10 +62,10 @@ function getWebviewContent(currentData, committedData, differences, filePath, we
           <!-- When no changes are there, show the message -->
           ${totalDifferences <= 0 ? noChangesSection: ''}
           
-          <div class="version-toggle">
-              ${totalDifferences > 0 ? '<button class="version-btn" onclick="toggleVersion(\'committed\')">Previous Version</button>' : '' }
-              <button class="version-btn active" onclick="toggleVersion('current')">Current Version</button>
-              ${totalDifferences > 0 ? '<button class="version-btn" onclick="toggleVersion(\'diff\')">View Changes</button>' : ''}
+          <div class="version-toggle">              
+              ${totalDifferences > 0 ? `<button class="version-btn" onclick="toggleVersion('committed')">${previousVersionButton}</button>` : ''}
+              <button class="version-btn active" onclick="toggleVersion('current')">${currentVersionButton}</button>
+              ${totalDifferences > 0 ? `<button class="version-btn" onclick="toggleVersion('diff')">View Changes</button>` : ''}
           </div>
 
           <div class="tabs">
@@ -90,7 +102,15 @@ function getWebviewContent(currentData, committedData, differences, filePath, we
 
           <script>
               let currentView = 'current';
-
+              const vscode = acquireVsCodeApi();
+              
+              // when user clicks on the manual upload button, emit an event (This is like emiting/broadcasting an event)
+              document.getElementById('manual-upload').addEventListener('click', (event) => {
+                  vscode.postMessage({
+                      command: {eventType: '${UPLOAD_AND_COMPARE_EXCEL_FILES}'}
+                  });
+              });
+              
               function switchTab(sheetName) {
                   // Hide all sheets
                   document.querySelectorAll('.sheet-content').forEach(sheet => {

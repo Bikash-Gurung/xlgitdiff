@@ -1,9 +1,15 @@
 const RUNNING_COMMAND = 'xldiff.diffxl';
 const VIEW_OPTION_COMMAND = 'xldiff.viewfile';
-const VIEW_OPTION_DISPLAY_NAME = 'Excel Diff Viewer';
+const VIEW_OPTION_DISPLAY_NAME = 'Excel Git Diff Viewer';
+const UPLOAD_AND_COMPARE_EXCEL_FILES = 'xldiff.upload.and.compare';
+const UPLOAD_AND_COMPARE_EXCEL_FILES_DISPLAY_NAME = 'Two Excel Files Diff Viewer';
+const SELECT_TWO_EXCEL_FILES_BUTTON_LABEL = 'Select Two Excel Files';
 
 module.exports = {
     RUNNING_COMMAND, 
     VIEW_OPTION_COMMAND,
-    VIEW_OPTION_DISPLAY_NAME
+    VIEW_OPTION_DISPLAY_NAME,
+    UPLOAD_AND_COMPARE_EXCEL_FILES,
+    UPLOAD_AND_COMPARE_EXCEL_FILES_DISPLAY_NAME,
+    SELECT_TWO_EXCEL_FILES_BUTTON_LABEL
 }

@@ -25,12 +25,16 @@
       {
         "command": "xldiff.diffxl",
         "title": "Show Excel Diff"
+      },
+      {
+        "command": "xldiff.upload.and.compare",
+        "title": "Upload and Compare Excel Files"
       }
     ],
     "customEditors": [
       {
         "viewType": "xldiff.viewfile",
-        "displayName": "Excel Diff Viewer",
+        "displayName": "Excel Git Diff Viewer",
         "selector": [
           {
             "filenamePattern": "*.xls*"
