@@ -32,18 +32,7 @@ function getWebviewContent(currentData, committedData, differences, filePath, we
       <body>
           <div class="header">
               <div class="file-path">${filePath}</div>
-              <div class="summary">
-                  <div class="summary-left">
-                      <div class="summary-item">Sheets: ${allSheets.length}</div>
-                      <div class="summary-item">Total Changes: ${totalDifferences}</div>
-                  </div>
-                  <div class="summary-right">
-                      <div class="summary-item manual-upload-btn" id="manual-upload" onclick="manuallySelectAndCompareFiles();" 
-                        data-title="You can select and compare two excel files. For exmaple, files from two different commits or similar uncommitted files.">Upload and Compare</div>
-                  </div>
-              </div>
           </div>
-
           <div class="legend">
               <div class="legend-item">
                   <div class="legend-color legend-added"></div>
@@ -62,11 +51,17 @@ function getWebviewContent(currentData, committedData, differences, filePath, we
           <!-- When no changes are there, show the message -->
           ${totalDifferences <= 0 ? noChangesSection: ''}
           
-          <div class="version-toggle">              
-              ${totalDifferences > 0 ? `<button class="version-btn" onclick="toggleVersion('committed')">${previousVersionButton}</button>` : ''}
-              <button class="version-btn active" onclick="toggleVersion('current')">${currentVersionButton}</button>
-              ${totalDifferences > 0 ? `<button class="version-btn" onclick="toggleVersion('diff')">View Changes</button>` : ''}
-          </div>
+          <div class="version-toggle">
+              <div class="summary-left">
+                  <div>${totalDifferences > 0 ? `<button class="version-btn" onclick="toggleVersion('committed')">${previousVersionButton}</button>` : ''}</div>
+                  <div><button class="version-btn active" onclick="toggleVersion('current')">${currentVersionButton}</button></div>
+                  <div>${totalDifferences > 0 ? `<button class="version-btn" onclick="toggleVersion('diff')">View Changes</button>` : ''}</div>
+              </div>
+              <div class="summary-right">
+                    <div class="summary-item manual-upload-btn" id="manual-upload" onclick="manuallySelectAndCompareFiles();" 
+                        data-title="You can select and compare two excel files. For exmaple, files from two different commits or similar uncommitted files.">Upload and Compare</div>
+              </div>
+            </div>
 
           <div class="tabs">
               ${allSheets

@@ -12,8 +12,8 @@ body {
 }
 
 .header {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
     border-bottom: 1px solid var(--vscode-panel-border);
 }
 
@@ -26,9 +26,11 @@ body {
 .summary, .summary-left {
     display: flex;
     gap: 20px;
+    flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
 }
+
 
 .summary-item {
     background: var(--vscode-badge-background);
@@ -40,7 +42,7 @@ body {
 
 .manual-upload-btn {
     position: relative;
-    background-color: #007acc;
+    background-color: #2ea043;
     color: #ffffff;
     cursor: pointer;
     font-size: 14px;
@@ -50,7 +52,7 @@ body {
 }
 
 .manual-upload-btn:hover {
-  background-color: #005ea2;
+  background-color: #3fa652;
   transform: scale(1.01);
 }
 
@@ -239,6 +241,8 @@ th {
 
 .version-toggle {
     margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .version-btn {
